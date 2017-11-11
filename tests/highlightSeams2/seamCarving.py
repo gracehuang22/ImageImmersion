@@ -53,7 +53,6 @@ def energyFunction(image):
 def findMinimumSeam(energyMap):
     rows = len(energyMap)
     columns = len(energyMap[0])
-    minPath = []
     # First, an accumulated cost matrix must be constructed by starting at the
     # top edge and iterating through the rows of the energy map.
     accumulatedCost = [[0.0] * columns for i in range(rows)]
@@ -87,42 +86,32 @@ def findMinimumSeam(energyMap):
             # accumulated cost matrix.
             accumulatedCost[i][j] = energyMap[i][j] + minOfNeighbors
 
-    # The minimum seam is then calculated by backtracing from the bottom to the top edge.
-    # First, the minimum value pixel in the bottom row of the accumulated cost matrix
-    # is located. This is the bottom pixel of the minimum seam.
-    # The seam is then traced back up to the top row of the accumulated cost matrix by following.
-    # The minimum seam coordinates are recorded.
+    #The minimum seam is then calculated by backtracing from the bottom to the top edge.
+    #First, the minimum value pixel in the bottom row of the accumulated cost matrix
+    #is located. This is the bottom pixel of the minimum seam.
+    #The seam is then traced back up to the top row of the accumulated cost matrix by following.
+    #The minimum seam coordinates are recorded.
     minPath = []
-    minNeighbors = []
+
     print ("accumulatedCost", accumulatedCost)
 
-    minBottomPixelX = np.argmin(accumulatedCost[rows-1])
-    currMinX = minBottomPixelX
-    minPath.append((currMinX,rows-1))
-
-    for i in range(rows-2,-1,-1):
-        minNeighbors = []
-
-        if (i-1 > 0 and currMinX+1 < columns-1): #add topright
-            minNeighbors.append(accumulatedCost[i-1][currMinX+1])
-        if (i-1 > 0): #add top center
-            minNeighbors.append(accumulatedCost[i-1][currMinX])
-        if (i-1 > 0 and currMinX-1 > 0): #add topleft
-            minNeighbors.append(accumulatedCost[i-1][currMinX-1])
-        if (len(minNeighbors) == 0):
-            minNeighbors.append(accumulatedCost[i][j])
-            break
-        currMinX = np.argmin(minNeighbors) - 1 + currMinX
-        #subtract 1 because can be left, mid, right. left = -1, mid = 0
-        minPath.append((currMinX,i))
-        print("lengthY", len(accumulatedCost[i]))
-        print("argmin",  np.argmin(minNeighbors))
-        print("currMinX", (currMinX,i))
+    for i in range(rows-1,-1,-1):
+        print ("accumulatedCost[i]", accumulatedCost[i])
+        minOfBottomRow = min(i for i in accumulatedCost[i])
+        print ("minOfBottomRow", minOfBottomRow)
+        #print("accCost[i]", accumulatedCost[i])
+        minValPixelX = accumulatedCost[i].index(minOfBottomRow)
+        print ("minValPixelX", minValPixelX)
+        minPath.append((minValPixelX,i))
+        #print("x", minValPixelX)
 
     return minPath
 
 def highlightSeam(image, path):
-    rows = len(path)
+    rows = len(image)
+    print("lengthOfImage",rows)
+    print("lengthOfPath",len(path))
+    #columns = len(image[0])
     highlightedEnergyMap = image
     print("highlightedEnergyMap 0,1", highlightedEnergyMap[0][1])
 
