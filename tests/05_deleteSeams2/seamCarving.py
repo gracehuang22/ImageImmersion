@@ -11,10 +11,10 @@ from matplotlib import pyplot as plt
 from PIL import Image
 
 def readImage(image):
-    bgr_img = cv2.imread( image )
-    im = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2RGB)
+    im = cv2.imread( image )
     im = im.astype(np.uint8)
     return im
+
 
 def energyFunction(image):
     im = cv2.imread( image )
@@ -122,7 +122,6 @@ def deleteSeam(image, path):
 def main():
     imageFile = sys.argv[1]
     origImage = readImage(imageFile)
-
     for i in range(10):
         image = readImage(imageFile)
         energyMap = energyFunction(imageFile)
