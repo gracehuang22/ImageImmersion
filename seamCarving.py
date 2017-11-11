@@ -132,24 +132,18 @@ def highlightSeam(image, path):
     return highlightedEnergyMap
 
 def deleteSeam(image, path):
-    return image
-    # rows = len(image)
-    # columns = len(image[0])
-    # path_set = set(path)
-    # seen_set = set()
-    # deleted  = [[0,0,0] * columns for i in range(rows)]
-    #
-    # for x in range(columns-1):
-    # 	for y in range(rows-1):
-    #         print("y,x", deleted[y][x])
-    #         if (x,y) not in path_set and y not in seen_set:
-    # 			deleted[y][x] = image[y][x]
-    #         elif (x,y) in path_set:
-    # 			seen_set.add(y)
-    #         else:
-    # 			deleted[y][x-1] = image[y][x]
-    #
-    # return deleted
+    rows = len(image)
+    columns = len(image[0])
+    deleted = np.zeros((rows, columns-1, 3), dtype=np.uint8)
+
+    for y in range(rows-1):
+    	for x in range(columns-1):
+            if (x,y) in path:
+    	       deleted[y][x] = image[y][x+1]
+            else:
+               deleted[y][x] = image[y][x]
+
+    return deleted
 
 def main():
     image = readImage(sys.argv[1])
@@ -158,10 +152,11 @@ def main():
     highlightedEnergyMap = highlightSeam(image, returnPath)
     scipy.misc.imsave('seam.jpg', highlightedEnergyMap)
 
+    print("highlighted",highlightedEnergyMap)
     deleted = deleteSeam(image, returnPath)
-    print( "deleted", deleted)
-    scipy.misc.imsave('deleted.jpg', deleted)
-    cv2.imshow('image',highlightedEnergyMap)
+    img = Image.fromarray(deleted, 'RGB')
+    img.save('deleted.png')
+    img.show()
 
 if __name__ == "__main__":
 	main()
