@@ -126,15 +126,19 @@ def main():
         energyMap = energyFunction(image)
         returnPath = findMinimumSeam(energyMap)
         highlightedEnergyMap = highlightSeam(origImage, returnPath)
+        #highlightedImg = Image.fromarray(highlightedEnergyMap, 'RGB')
+        #highlightedImg.save('seam.jpg')
 
         deleted = deleteSeam(image, returnPath)
         image = deleted
-
+        #image = Image.fromarray(deleted, 'RGB')
+        #img.save('deleted.png')
+        #img.show()
+        #imageFile = 'deleted.png'
     highlightedImg = Image.fromarray(highlightedEnergyMap, 'RGB')
     highlightedImg.save('highlightedIterations.jpg')
     img = Image.fromarray(image, 'RGB')
     img.save('deletedIterations.png')
-    #img.show()
 
 if __name__ == "__main__":
 	main()
