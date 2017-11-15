@@ -15,9 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from myImageImmersion.views import index,upload
+from myImageImmersion.views import index,upload,display
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^$', index, name = 'index'),
-    url(r'^upload/',upload, name = 'upload'),]
+    url(r'^$', upload, name = 'index'),
+    url(r'^upload/',upload, name = 'upload'),
+    url(r'^display/',display, name = 'display'),
+]

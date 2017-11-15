@@ -18,7 +18,6 @@ from django.core.urlresolvers import reverse
 from myImageImmersion.models import Document
 from myImageImmersion.forms import DocumentForm
 
-
 # def index(request):
 #    today = datetime.now().date()
 #    return render(request, "index.html", {"today" : today})
@@ -32,7 +31,7 @@ def upload(request):
             newdoc.save()
 
             # Redirect to the document list after POST
-            return HttpResponseRedirect(reverse('myImageImmersion.views.upload'))
+            return HttpResponseRedirect(reverse(display))
     else:
         form = DocumentForm() # A empty, unbound form
 
@@ -40,11 +39,11 @@ def upload(request):
     documents = Document.objects.all()
 
     # Render list page with the documents and the form
-    return render_to_response(
-        'upload.html',
-        {'documents': documents, 'form': form},
-        # context=RequestContext(request)
-    )
+    return render(request,'upload.html',
+        {'documents': documents, 'form': form})
+
+def display(request):
+    return render(request,'display.html',{})
 
 def index(request):
-    return render_to_response('index.html')
+    return render(request,'index.html',{})
