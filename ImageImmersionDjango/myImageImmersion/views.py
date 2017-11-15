@@ -4,33 +4,47 @@ from __future__ import unicode_literals
 from django.shortcuts import render
 
 # Create your views here.
+from django.views import generic
+from django.views.generic import CreateView
 from django.http import HttpResponse
 from datetime import datetime
 from django.shortcuts import render
 
-from myImageImmersion.forms import ProfileForm
-from myImageImmersion.models import Profile
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
 
+from myImageImmersion.models import Document
+from myImageImmersion.forms import DocumentForm
+
+
+# def index(request):
+#    today = datetime.now().date()
+#    return render(request, "index.html", {"today" : today})
+#-*- coding: utf-8 -*-
+def upload(request):
+    # Handle file upload
+    if request.method == 'POST':
+        form = DocumentForm(request.POST, request.FILES)
+        if form.is_valid():
+            newdoc = Document(docfile = request.FILES['docfile'])
+            newdoc.save()
+
+            # Redirect to the document list after POST
+            return HttpResponseRedirect(reverse('myImageImmersion.views.upload'))
+    else:
+        form = DocumentForm() # A empty, unbound form
+
+    # Load documents for the list page
+    documents = Document.objects.all()
+
+    # Render list page with the documents and the form
+    return render_to_response(
+        'upload.html',
+        {'documents': documents, 'form': form},
+        # context=RequestContext(request)
+    )
 
 def index(request):
-   today = datetime.now().date()
-   return render(request, "index.html", {"today" : today})
-#-*- coding: utf-8 -*-
-
-def SaveProfile(request):
-   saved = False
-
-   if request.method == "POST":
-      #Get the posted form
-      MyProfileForm = ProfileForm(request.POST, request.FILES)
-
-      if MyProfileForm.is_valid():
-         profile = Profile()
-         profile.name = MyProfileForm.cleaned_data["name"]
-         profile.picture = MyProfileForm.cleaned_data["picture"]
-         profile.save()
-         saved = True
-   else:
-      MyProfileForm = ProfileForm()
-
-   return render(request, 'profile.html', locals())
+    return render_to_response('index.html')

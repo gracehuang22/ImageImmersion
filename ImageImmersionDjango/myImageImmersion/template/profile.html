@@ -1,39 +1,52 @@
 <html>
-   <body>
+<head>
 
-      <form name = "form" enctype = "multipart/form-data"
-         action = "{% url "myImageImmersion.views.SaveProfile" %}" method = "POST" >{% csrf_token %}
+</head>
 
-         <div style = "max-width:470px;">
-            <center>
-               <input type = "text" style = "margin-left:20%;"
-               placeholder = "Name" name = "name" />
-            </center>
-         </div>
 
-         <br>
+    <style>
+        body{
+            background-color: #2b542c;
+        }
 
-         <div style = "max-width:470px;">
-            <center>
-               <input type = "file" style = "margin-left:20%;"
-                  placeholder = "Picture" name = "picture" />
-            </center>
-         </div>
+        h1{
+              color: white;
+              background-color:#4cae4c;
+              width: 100%;
+              float:left;
+              height: 50px;
+        }
 
-         <br>
+        button{
+            width: auto;
+            height: 40px;
+            text-align: center;
+            background-color: #1b6d85;
+            color: #ffffff;
+            font-size: 30px;
+            margin-top: 20px;
+        }
+    </style>
 
-         <div style = "max-width:470px;">
-            <center>
 
-               <button style = "border:0px;background-color:#4285F4; margin-top:8%;
-                  height:35px; width:80%; margin-left:19%;" type = "submit" value = "Login" >
-                  <strong>Login</strong>
-               </button>
+<body >
 
-            </center>
-         </div>
+<h1>Add a new User</h1>
 
-      </form>
+{% if error_message %}
+    <p><strong>{{ error_message }}</strong></p>
+{% endif %}
+<form action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% include 'uploadfileapp/form-template.html' %}
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-success">Submit</button>
+        </div>
+    </div>
+</form>
 
-   </body>
+</body>
+
+
 </html>
