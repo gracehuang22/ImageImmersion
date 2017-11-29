@@ -96,9 +96,9 @@ def findMinimumSeam(energyMap):
 def highlightSeam(image, path):
     rows = len(path)
     highlightedEnergyMap = image
-    print("highlightedEnergyMap 0,1", highlightedEnergyMap[0][1])
 
     for i in range(rows-1,-1, -1):
+        # print("highlightedEnergyMap x,y", (path[i][0],path[i][1]))
         highlightedEnergyMap[path[i][1]][path[i][0]] = [255, 0, 0]
 
     return highlightedEnergyMap
@@ -106,35 +106,54 @@ def highlightSeam(image, path):
 def deleteSeam(image, path):
     rows = len(image)
     columns = len(image[0])
+    shifted = []
     deleted = np.zeros((rows, columns-1, 3), dtype=np.uint8)
-
-    for y in range(rows-1):
+    # print("path", path)
+    for y in range(rows):
     	for x in range(columns-1):
-            if (x,y) in path:
+            if (x,y) in path or (x,y) in shifted:
+            #    print("delete path x y", (x,y))
     	       deleted[y][x] = image[y][x+1]
+               shifted.append((x+1,y))
             else:
                deleted[y][x] = image[y][x]
 
     return deleted
+
+# def insertSeam(image, path):
+#     rows = len(image)
+#     columns = len(image[0])
+#     inserted = np.zeros((rows, columns+1, 3), dtype=np.uint8)
+#
+#     for y in range(rows-1):
+#     	for x in range(columns-1):
+#             if (x,y) in path:
+#     	       inserted[y][x+1] = image[y][x]
+#             else:
+#                inserted[y][x] = image[y][x]
+#
+#     return inserted
 
 def main():
     imageFile = sys.argv[1]
     origImage = readImage(imageFile)
     image = readImage(imageFile)
 
-    for i in range(20):
+    for i in range(5):
         energyMap = energyFunction(image)
         returnPath = findMinimumSeam(energyMap)
         highlightedEnergyMap = highlightSeam(origImage, returnPath)
 
         deleted = deleteSeam(image, returnPath)
         image = deleted
+        print("iteration", i)
 
-    highlightedImg = Image.fromarray(highlightedEnergyMap, 'RGB')
-    highlightedImg.save('highlightedIterations.jpg')
-    img = Image.fromarray(image, 'RGB')
-    img.save('deletedIterations.png')
-    #img.show()
+        # energyImg = Image.fromarray(energyMap, 'RGB')
+        # energyImg.save('energyMap_2_1.jpg')
+        highlightedImg = Image.fromarray(highlightedEnergyMap, 'RGB')
+        highlightedImg.save('highlightedIterations_2_1.jpg')
+        img = Image.fromarray(deleted, 'RGB')
+        img.save('deletedIterations_2_1.png')
 
 if __name__ == "__main__":
 	main()

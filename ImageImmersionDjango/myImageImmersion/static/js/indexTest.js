@@ -1,5 +1,5 @@
 var scene, camera, renderer, allCubes, mouseVector, raycaster;
-var click;
+var click, texture;
  var cssRenderer, cssScene, element, cssObject;
 var meshFloor;
 var sceneCubes = [];
@@ -8,6 +8,8 @@ var player = { height:0.5, speed:0.2, turnSpeed:Math.PI*0.02 };
 
 
 function init() {
+  texture = new THREE.TextureLoader().load( "bg1.jpg" );
+
   scene = new THREE.Scene();
   	mouseVector = new THREE.Vector3();
   // var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -24,14 +26,84 @@ function init() {
 
   // var material = new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture('img/stoneWall.jpg') } );
 
+  // var texture = new THREE.TextureLoader().load( "images/bg1.jpg" );
+  // var img = new THREE.MeshBasicMaterial({ //CHANGED to MeshBasicMaterial
+  //     map: texture
+  // });
+  // img.map.needsUpdate = true; //ADDED
+  //
+  // // plane
+  // var plane = new THREE.Mesh(new THREE.PlaneGeometry(200, 200),img);
+  // plane.overdraw = true;
+  // scene.add(plane);
+  geometry = new THREE.BoxGeometry( 10, 10, 10 );
+	// Create a MeshBasicMaterial with a loaded texture
+	material = new THREE.MeshBasicMaterial( { map: texture} );
+  material.map.needsUpdate = true;
+	// Combine the geometry and material into a mesh
+	mesh = new THREE.Mesh( geometry, material );
+	// Add the mesh to the scene
+	scene.add( mesh );
+
   meshFloor = new THREE.Mesh(
     new THREE.PlaneGeometry(10,10, 10,10),
     new THREE.MeshBasicMaterial({color:0xffffff, wireframe:true})
     // material
   );
 
+
+
+  var geometry = new THREE.SphereGeometry(10,-30,100, 100, 32);
+  // var texture = new THREE.TextureLoader().load( "images/bg1.jpg" );
+  //   texture.wrapS = THREE.RepeatWrapping;
+  //   texture.wrapT = THREE.RepeatWrapping;
+  //   texture.repeat.set( 4, 4 );
+    // instantiate a loader
+  // var loader = new THREE.TextureLoader();
+  // var texture = loader.load( 'bg1.jpg' );
+  // var backgroundMesh = new THREE.Mesh(
+  //     new THREE.PlaneGeometry(2048, 2048,8,8),
+  //     new THREE.MeshBasicMaterial({
+  //          map: texture
+  //     }));
+  //
+  //
+  // backgroundMesh.material.depthTest = false;
+  // backgroundMesh.material.depthWrite = false;
+  // // load a resource
+  // loader.load(
+  // 	// resource URL
+  // 	"bg1.jpg" ,
+  // 	// Function when resource is loaded
+  // 	function ( texture ) {
+  //
+  // 		// in this example we create the material when the texture is loaded
+  // 		var sphereMaterial = new THREE.MeshBasicMaterial( {
+  // 			map: texture
+  // 		 } );
+  //      var sphere = new THREE.Mesh( geometry, sphereMaterial );
+  //      scene.add( sphere );
+  // 	},
+  // 	// Function called when download progresses
+  // 	function ( xhr ) {
+  // 		console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+  // 	},
+  // 	// Function called when download errors
+  // 	function ( xhr ) {
+  // 		console.error( 'An error happened' + JSON.stringify(xhr));
+  // 	}
+  // );
+  // var sphereMaterial = new THREE.MeshBasicMaterial( { map: texture } );
+  var sphereMaterial = new THREE.MeshBasicMaterial( {color: 0x4286f4} );
+       var sphere = new THREE.Mesh( geometry, sphereMaterial );
+       scene.add( sphere );
+
   light = new THREE.HemisphereLight(0xffbf67, 0x15c6ff);
   scene.add(light);
+
+  // var light = new THREE.PointLight( 0xff0000, 1, 100 );
+  // light.position.set( 50, 50, 50 );
+  // scene.add( light );
 
   meshFloor.rotation.x -= Math.PI / 2; // Rotate the floor 90 degrees
   scene.add(meshFloor);
@@ -43,8 +115,10 @@ function init() {
      { name: 'contact', position: new THREE.Vector3( 6, 5, 1), url: 'http://gracehuang.net/photography.html'}
  	];
 
-  createClickableBoxes();
-  createMoreBoxes(10);
+  // console.log("texture:" + JSON.stringify(texture));
+
+  // createClickableBoxes();
+  // createMoreBoxes(10);
   // createText();
   createHTMLElem();
   animate();
@@ -67,32 +141,32 @@ function createHTMLElem(){
   // element.src = 'img/TravelBuddy.png';
 
   // instantiate a loader
-  var loader = new THREE.TextureLoader();
-  var material;
-  // load a resource
-  loader.load(
-      // resource URL
-      'img/TravelBuddy.png',
-      // Function when resource is loaded
-      function ( texture ) {
-          // do something with the texture
-          material = new THREE.MeshBasicMaterial( {
-              map: texture
-           } );
-           var geometry = new THREE.PlaneGeometry(4,4,4,4);
-           var planeMesh= new THREE.Mesh( geometry, material );
-         //  add it to the WebGL scene
-           scene.add(planeMesh);
-      },
-      // Function called when download progresses
-      function ( xhr ) {
-          console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-      },
-      // Function called when download errors
-      function ( xhr ) {
-          console.log( 'An error happened' );
-      }
-  );
+  // var loader = new THREE.TextureLoader();
+  // var material;
+  // // load a resource
+  // loader.load(
+  //     // resource URL
+  //     // 'img/TravelBuddy.png',
+  //     // Function when resource is loaded
+  //     function ( texture ) {
+  //         // do something with the texture
+  //         material = new THREE.MeshBasicMaterial( {
+  //             map: texture
+  //          } );
+  //          var geometry = new THREE.PlaneGeometry(4,4,4,4);
+  //          var planeMesh= new THREE.Mesh( geometry, material );
+  //        //  add it to the WebGL scene
+  //          scene.add(planeMesh);
+  //     },
+  //     // Function called when download progresses
+  //     function ( xhr ) {
+  //         console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+  //     },
+  //     // Function called when download errors
+  //     function ( xhr ) {
+  //         console.log( 'An error happened' );
+  //     }
+  // );
 
 
   // plane
