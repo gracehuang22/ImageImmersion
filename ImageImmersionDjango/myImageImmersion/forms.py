@@ -2,6 +2,9 @@
 from django import forms
 
 class DocumentForm(forms.Form):
-    docfile = forms.FileField(
+    image = forms.ImageField(
         label='Select a file',
     )
+
+class ImageForm(forms.Form):
+    fname = forms.CharField(label='File name', max_length=100)
