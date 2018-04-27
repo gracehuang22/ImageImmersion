@@ -16,8 +16,12 @@ def readImage(image):
     im = im.astype(np.uint8)
     return im
 
-def energyFunction(image):
+def energyFunction(image, imageMask):
     img = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+    imgMask = cv2.cvtColor(imageMask, cv2.COLOR_RGB2GRAY)
+
+    rows = len(image)
+    columns = len(image[0])
 
     dx = ndimage.sobel(img, 0)  # horizontal derivative
     dy = ndimage.sobel(img, 1)  # vertical derivative
@@ -27,6 +31,15 @@ def energyFunction(image):
     posXDer = np.abs(dx)
     posYDer = np.abs(dy)
     energyFunction = posXDer + posYDer
+    energyFunction = energyFunction.astype(np.int16)
+    for i in range(0,rows, 1):
+        for j in range(0, columns, 1):
+            # print(type(energyFunction))
+            # print ("imageMask i j", i, j, imageMask[i][j])
+            if (imgMask[i][j] == 0):
+                energyFunction[i][j] = -10
+                # print("negative")
+            # print ("energyFunction ", energyFunction[i][j])
 
     return energyFunction
 
@@ -103,22 +116,25 @@ def highlightSeam(image, path):
 
     return highlightedEnergyMap
 
-def deleteSeam(image, path):
+def deleteSeam(image, imageMask, path):
     rows = len(image)
     columns = len(image[0])
     shifted = []
     deleted = np.zeros((rows, columns-1, 3), dtype=np.uint8)
+    #deletedMask = np.zeros((rows, columns-1, 3), dtype=np.uint8)
     # print("path", path)
     for y in range(rows):
+        #print("rows: ", y)
     	for x in range(columns-1):
             if (x,y) in path or (x,y) in shifted:
-            #    print("delete path x y", (x,y))
+               #print("delete path x y", (x,y))
     	       deleted[y][x] = image[y][x+1]
                shifted.append((x+1,y))
+            elif (x,y) in path:
+               imageMask[y][x] = [255,255,255]
             else:
                deleted[y][x] = image[y][x]
-
-    return deleted
+    return (deleted, imageMask)
 
 # def insertSeam(image, path):
 #     rows = len(image)
@@ -136,24 +152,32 @@ def deleteSeam(image, path):
 
 def main():
     imageFile = sys.argv[1]
+    imageMaskFile = sys.argv[2]
     origImage = readImage(imageFile)
-    image = readImage(imageFile)
+    imageMask = readImage(imageMaskFile)
+    image = origImage
+    img = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+    imgMask = cv2.cvtColor(imageMask, cv2.COLOR_RGB2GRAY)
 
-    for i in range(5):
-        energyMap = energyFunction(image)
+    rows = len(image)
+    columns = len(image[0])
+
+    for i in range(columns):
+        energyMap = energyFunction(image, imageMask)
         returnPath = findMinimumSeam(energyMap)
-        highlightedEnergyMap = highlightSeam(origImage, returnPath)
+        highlightedEnergyMap = highlightSeam(image, returnPath)
 
-        deleted = deleteSeam(image, returnPath)
-        image = deleted
+        deleted = deleteSeam(image, imageMask, returnPath)
+        image = deleted[0]
+        imageMask = deleted[1]
         print("iteration", i)
 
-        # energyImg = Image.fromarray(energyMap, 'RGB')
-        # energyImg.save('energyMap_2_1.jpg')
+        imgMask = Image.fromarray(imageMask, 'RGB')
+        # imgMask.save('mask_' +str(i) + 'mask_small.jpg')
         highlightedImg = Image.fromarray(highlightedEnergyMap, 'RGB')
-        highlightedImg.save('highlightedIterations_2_1.jpg')
-        img = Image.fromarray(deleted, 'RGB')
-        img.save('deletedIterations_2_1.png')
+        highlightedImg.save(str(i) + 'highlighted_small.jpg')
+        img = Image.fromarray(image, 'RGB')
+        img.save(str(i) + 'deleted_small.png')
 
 if __name__ == "__main__":
 	main()

@@ -11,39 +11,31 @@ function init() {
   texture = new THREE.TextureLoader().load( "bg1.jpg" );
 
   scene = new THREE.Scene();
-  	mouseVector = new THREE.Vector3();
+  mouseVector = new THREE.Vector3();
   // var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
   // camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 1000 );
   camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
    camera.position.set(0, 0, -1000);
-  renderer = new THREE.WebGLRenderer();
-  renderer.setSize( window.innerWidth, window.innerHeight );
-  renderer.domElement.style.zIndex = 5;
-  document.body.appendChild( renderer.domElement );
+
+  container = document.getElementById( 'container' );
+	renderer = new THREE.WebGLRenderer();
+	renderer.setPixelRatio( window.devicePixelRatio );
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	container.appendChild( renderer.domElement );
 
   camera.position.set(0, player.height, -5);
 	camera.lookAt(new THREE.Vector3(0,player.height,0));
+  setLighting();
+  setSkybox();
 
-  // var material = new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture('img/stoneWall.jpg') } );
-
-  // var texture = new THREE.TextureLoader().load( "images/bg1.jpg" );
-  // var img = new THREE.MeshBasicMaterial({ //CHANGED to MeshBasicMaterial
-  //     map: texture
-  // });
-  // img.map.needsUpdate = true; //ADDED
-  //
-  // // plane
-  // var plane = new THREE.Mesh(new THREE.PlaneGeometry(200, 200),img);
-  // plane.overdraw = true;
-  // scene.add(plane);
-  geometry = new THREE.BoxGeometry( 10, 10, 10 );
-	// Create a MeshBasicMaterial with a loaded texture
-	material = new THREE.MeshBasicMaterial( { map: texture} );
-  material.map.needsUpdate = true;
-	// Combine the geometry and material into a mesh
-	mesh = new THREE.Mesh( geometry, material );
-	// Add the mesh to the scene
-	scene.add( mesh );
+  // geometry = new THREE.BoxGeometry( 10, 10, 10 );
+	// // Create a MeshBasicMaterial with a loaded texture
+	// material = new THREE.MeshBasicMaterial( { map: texture} );
+  // material.map.needsUpdate = true;
+	// // Combine the geometry and material into a mesh
+	// mesh = new THREE.Mesh( geometry, material );
+	// // Add the mesh to the scene
+	// scene.add( mesh );
 
   meshFloor = new THREE.Mesh(
     new THREE.PlaneGeometry(10,10, 10,10),
@@ -51,69 +43,15 @@ function init() {
     // material
   );
 
-
-
-  var geometry = new THREE.SphereGeometry(10,-30,100, 100, 32);
-  // var texture = new THREE.TextureLoader().load( "images/bg1.jpg" );
-  //   texture.wrapS = THREE.RepeatWrapping;
-  //   texture.wrapT = THREE.RepeatWrapping;
-  //   texture.repeat.set( 4, 4 );
-    // instantiate a loader
-  // var loader = new THREE.TextureLoader();
-  // var texture = loader.load( 'bg1.jpg' );
-  // var backgroundMesh = new THREE.Mesh(
-  //     new THREE.PlaneGeometry(2048, 2048,8,8),
-  //     new THREE.MeshBasicMaterial({
-  //          map: texture
-  //     }));
-  //
-  //
-  // backgroundMesh.material.depthTest = false;
-  // backgroundMesh.material.depthWrite = false;
-  // // load a resource
-  // loader.load(
-  // 	// resource URL
-  // 	"bg1.jpg" ,
-  // 	// Function when resource is loaded
-  // 	function ( texture ) {
-  //
-  // 		// in this example we create the material when the texture is loaded
-  // 		var sphereMaterial = new THREE.MeshBasicMaterial( {
-  // 			map: texture
-  // 		 } );
-  //      var sphere = new THREE.Mesh( geometry, sphereMaterial );
-  //      scene.add( sphere );
-  // 	},
-  // 	// Function called when download progresses
-  // 	function ( xhr ) {
-  // 		console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-  // 	},
-  // 	// Function called when download errors
-  // 	function ( xhr ) {
-  // 		console.error( 'An error happened' + JSON.stringify(xhr));
-  // 	}
-  // );
-  // var sphereMaterial = new THREE.MeshBasicMaterial( { map: texture } );
-  var sphereMaterial = new THREE.MeshBasicMaterial( {color: 0x4286f4} );
-       var sphere = new THREE.Mesh( geometry, sphereMaterial );
-       scene.add( sphere );
-
-  light = new THREE.HemisphereLight(0xffbf67, 0x15c6ff);
-  scene.add(light);
-
-  // var light = new THREE.PointLight( 0xff0000, 1, 100 );
-  // light.position.set( 50, 50, 50 );
-  // scene.add( light );
-
   meshFloor.rotation.x -= Math.PI / 2; // Rotate the floor 90 degrees
   scene.add(meshFloor);
 
-  allCubes = [
-     { name: 'code', position: new THREE.Vector3(-6, 3, 3), url: 'http://gracehuang.net/code.html'},
-     { name: 'videos', position: new THREE.Vector3( -6, 5, 1), url: 'http://gracehuang.net/me.html'},
-     { name: 'art', position: new THREE.Vector3(6, 3, 3), url: 'http://gracehuang.net/art.html'},
-     { name: 'contact', position: new THREE.Vector3( 6, 5, 1), url: 'http://gracehuang.net/photography.html'}
- 	];
+  // allCubes = [
+  //    { name: 'code', position: new THREE.Vector3(-6, 3, 3), url: 'http://gracehuang.net/code.html'},
+  //    { name: 'videos', position: new THREE.Vector3( -6, 5, 1), url: 'http://gracehuang.net/me.html'},
+  //    { name: 'art', position: new THREE.Vector3(6, 3, 3), url: 'http://gracehuang.net/art.html'},
+  //    { name: 'contact', position: new THREE.Vector3( 6, 5, 1), url: 'http://gracehuang.net/photography.html'}
+ // 	];
 
   // console.log("texture:" + JSON.stringify(texture));
 
@@ -126,77 +64,62 @@ function init() {
 
 }
 
+function setSkybox() {
+  cubeMap = new THREE.CubeTexture( [] );
+  cubeMap.format = THREE.RGBFormat;
+  var loader = new THREE.ImageLoader();
+  loader.load( 'images/bg1.jpg', function ( image ) {
+    var getSide = function ( x, y ) {
+      var size = 350;
+      var canvas = document.createElement( 'canvas' );
+      canvas.width = size;
+      canvas.height = size;
+      var context = canvas.getContext( '2d' );
+      context.drawImage( image, - x * size, - y * size );
+      return canvas;
+    };
+    cubeMap.images[ 0 ] = getSide( 2, 1 ); // px
+    cubeMap.images[ 1 ] = getSide( 0, 1 ); // nx
+    cubeMap.images[ 2 ] = getSide( 1, 0 ); // py
+    cubeMap.images[ 3 ] = getSide( 1, 2 ); // ny
+    cubeMap.images[ 4 ] = getSide( 1, 1 ); // pz
+    cubeMap.images[ 5 ] = getSide( 3, 1 ); // nz
+    cubeMap.needsUpdate = true;
+  } );
+  console.log("LOADED");
+  var cubeShader = THREE.ShaderLib[ 'cube' ];
+  cubeShader.uniforms[ 'tCube' ].value = cubeMap;
+  var skyBoxMaterial = new THREE.ShaderMaterial( {
+    fragmentShader: cubeShader.fragmentShader,
+    vertexShader: cubeShader.vertexShader,
+    uniforms: cubeShader.uniforms,
+    side: THREE.BackSide
+  } );
+  var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+  var skyBox = new THREE.Mesh(
+    new THREE.BoxGeometry( 2000 * 5 + 100, 1000 * 5 + 100, 1000 * 5 + 100 ),
+    material
+  );
+  scene.add( skyBox );
+}
+
+function setLighting() {
+  renderer.shadowMap.enabled = true;
+  light = new THREE.DirectionalLight( 0xffffbb, 1 );
+  light.position.set( - 30, 30, - 30 );
+  light.castShadow = true;
+  light.shadow.camera.top = 45;
+  light.shadow.camera.right = 40;
+  light.shadow.camera.left = light.shadow.camera.bottom = -40;
+  light.shadow.camera.near = 1;
+  light.shadow.camera.far = 200;
+  scene.add( light, new THREE.AmbientLight( 0x888888 ) );
+}
+
 
 function createHTMLElem(){
   console.log("createHTML");
   cssScene = new THREE.Scene();
-  // create the plane mesh
-  // var material = new THREE.MeshBasicMaterial({color:0xffffff, wireframe:false});
-  // var geometry = new THREE.PlaneGeometry(4,4,4,4);
-  // var planeMesh= new THREE.Mesh( geometry, material );
-  // add it to the WebGL scene
-  // scene.add(planeMesh);
-  // create the dom Element
-  // element = document.createElement('img');
-  // element.src = 'img/TravelBuddy.png';
-
-  // instantiate a loader
-  // var loader = new THREE.TextureLoader();
-  // var material;
-  // // load a resource
-  // loader.load(
-  //     // resource URL
-  //     // 'img/TravelBuddy.png',
-  //     // Function when resource is loaded
-  //     function ( texture ) {
-  //         // do something with the texture
-  //         material = new THREE.MeshBasicMaterial( {
-  //             map: texture
-  //          } );
-  //          var geometry = new THREE.PlaneGeometry(4,4,4,4);
-  //          var planeMesh= new THREE.Mesh( geometry, material );
-  //        //  add it to the WebGL scene
-  //          scene.add(planeMesh);
-  //     },
-  //     // Function called when download progresses
-  //     function ( xhr ) {
-  //         console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-  //     },
-  //     // Function called when download errors
-  //     function ( xhr ) {
-  //         console.log( 'An error happened' );
-  //     }
-  // );
-
-
-  // plane
-  // var plane = new THREE.Mesh(new THREE.PlaneGeometry(200, 200),material);
-  // plane.overdraw = true;
-  // scene.add(plane);
-
-
-
-  // element = document.createElement('div');
-  // element.innerHTML = 'Plain text inside a div.';
-  // element.className = 'three-div';
-
-  // create the object3d for this element
-  // cssObject = new THREE.CSS3DObject(element);
-  // cssObject.position.x = 0;
-  // cssObject.position.y = 0;
-  // cssObject.position.z = -185;
-  // cssObject.rotation.y = Math.PI;
-  // we reference the same position and rotation
-  // cssObject.position = planeMesh.position;
-  // cssObject.rotation = planeMesh.rotation;
-
-  // add it to the css scene
-  // cssScene.add(cssObject);
-  // cssRenderer = new THREE.CSS3DRenderer();
-  // cssRenderer.setSize( window.innerWidth, window.innerHeight );
-  // cssRenderer.domElement.style.position = 'absolute';
-  // cssRenderer.domElement.style.top = 0;
-  // document.body.appendChild(cssRenderer.domElement);
 }
 
 

@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from myImageImmersion.views import index,upload,display,edit
+from myImageImmersion.views import index,upload,edit,display,final
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -26,5 +26,5 @@ urlpatterns = [
     url(r'^$', upload, name = 'index'),
     url(r'^upload/',upload, name = 'upload'),
     url(r'^edit/',edit, name = 'edit'),
-    url(r'^display/',display, name = 'display'),
+    url(r'^display/',final, name = 'final'),
 ]  + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

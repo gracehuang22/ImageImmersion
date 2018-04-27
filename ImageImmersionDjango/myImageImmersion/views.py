@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
+import os
 from django.shortcuts import render
-
+from django.shortcuts import redirect
 # Create your views here.
 from django.views import generic
 from django.views.generic import CreateView
@@ -24,12 +24,15 @@ from myImageImmersion.models import Files
 from myImageImmersion.forms import DocumentForm
 from myImageImmersion.forms import ImageForm
 
+from seamCarving import main
+
 def upload(request):
     # Handle file upload
     if request.method == 'POST':
         form = DocumentForm(request.POST, request.FILES)
         if form.is_valid():
             newdoc = Document(image = request.FILES['image'])
+
             newdoc.save()
 
             # Redirect to the document list after POST
@@ -56,17 +59,57 @@ def edit(request):
         filename = request.POST.get('save_fname', False)
         data = request.POST.get('save_cdata', False)
         data = data.split(",")
+        orig = request.POST.get('orig_image', False)
         binary_data = a2b_base64(data[1])
         fd = open(filename, 'w+')
         fd.write(binary_data)
         file_data = Files(name=filename)
         file_data.image.save(filename, File(fd))
         fd.close()
-        return HttpResponseRedirect(reverse(display))
 
+        documents = Document.objects.all()
+        #get recent picture
+        cwd = os.getcwd()
+        print(cwd)
+        recentPic = cwd + '/myImageImmersion' + documents.last().image.url
+        files = Files.objects.all()
+        recentMask = cwd+ '/myImageImmersion' + files.last().image.url
+        print("\n recentpic: " + recentPic + " , " + recentMask)
+        #run seamCarving on picture and mask
+        output = main(recentPic,recentMask)
+        print("doneSeam")
+
+
+        return HttpResponseRedirect(reverse(final))
 
 def display(request):
-    return render(request,'display.html',{})
+    # if post, get file path of mask and og picture
+    #show result of seamCarving
+    print("gotrequest: ", request)
+    if request.method == 'GET':
+        documents = Document.objects.all()
+        #get recent picture
+        cwd = os.getcwd()
+        print(cwd)
+        recentPic = cwd + '/myImageImmersion' + documents.last().image.url
+        files = Files.objects.all()
+        recentMask = cwd+ '/myImageImmersion' + files.last().image.url
+        print("\n recentpic: " + recentPic + " , " + recentMask)
+        #run seamCarving on picture and mask
+        output = main(recentPic,recentMask)
+        print("doneSeam")
+
+        newdoc = Document(image = cwd + "/" + output)
+        # print ("output: " + output)
+        newdoc.save()
+
+        # Render list page with the documents and the form
+        return HttpResponseRedirect(reverse(final))
+
+
+def final(request):
+    documents = Document.objects.all()
+    return render(request,'display.html',{'documents': documents})
 
 def index(request):
     return render(request,'index.html',{})
